@@ -15,6 +15,7 @@ helm repo add secrets-store-csi-driver \
 helm install -n kube-system csi-secrets-store \
   --set syncSecret.enabled=true \
   --set enableSecretRotation=true \
+  --set rotationPollInterval=15s \
   secrets-store-csi-driver/secrets-store-csi-driver
 ```
 
