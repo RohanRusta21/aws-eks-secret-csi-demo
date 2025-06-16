@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-secrets
+  labels:
+    app: k8s-secrets
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-secrets
+  template:
+    metadata:
+      labels:
+        app: k8s-secrets
+      annotations:
+        secrets-store.csi.x-k8s.io/rotation: "true"
+        secrets-store.csi.x-k8s.io/rotation-poll-interval: "5s"
+    spec:
+      serviceAccountName: my-sa
+      containers:
+      - name: k8s-secrets
+        image: nginx:latest
+        ports:
+          - containerPort: 80
+        volumeMounts:
+          - name: secrets-store-inline
+            mountPath: "/mnt/secrets"
+            readOnly: true
+        env:
+          - name: DB_USERNAME_01
+            valueFrom:
+              secretKeyRef:
+                name: secret-store
+                key: db_username_01
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: deployment-spc-k8s-secrets
