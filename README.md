@@ -60,7 +60,7 @@ eksctl utils associate-iam-oidc-provider --cluster secret-csi-cluster  --approve
                 "secretsmanager:GetSecretValue",
                 "secretsmanager:DescribeSecret"
             ],
-            "Resource": "arn:aws:secretsmanager:us-east-2:251620460948:secret:secret-store-IXeV0p"
+            "Resource": "<arn of your secret>"
         }
     ]
 }
@@ -80,12 +80,12 @@ aws iam create-policy --policy-name aws-eks-secret-csi-demo --policy-document fi
         {
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::251620460948:oidc-provider/oidc.eks.us-east-2.amazonaws.com/id/D13D2AB696B7BC7F2F9F3DD856F23F2F"
+                "Federated": "<arn of your oidc>"
             },
             "Action": "sts:AssumeRoleWithWebIdentity",
             "Condition": {
                 "StringEquals": {
-                    "oidc.eks.us-east-2.amazonaws.com/id/D13D2AB696B7BC7F2F9F3DD856F23F2F:sub": "system:serviceaccount:default:my-sa"
+                    "oidc.eks.us-east-2.amazonaws.com/id/<change it with your ID>:sub": "system:serviceaccount:ns:sa"
                 }
             }
         }
@@ -104,11 +104,11 @@ aws iam create-role --role-name role-aws-eks-secret-csi-demo --assume-role-polic
 ### Attaching the role with the policy we created in above steps
 
 ```
-aws iam attach-role-policy --role-name role-aws-eks-secret-csi-demo --policy-arn=arn:aws:iam::251620460948:policy/aws-eks-secret-csi-demo
+aws iam attach-role-policy --role-name role-aws-eks-secret-csi-demo --policy-arn=<policy arn>
 ```
 
 ### Appending Annotations in the ServiceAccount we have to use.
 
 ```
-kubectl annotate serviceaccount my-sa eks.amazonaws.com/role-arn=arn:aws:iam::251620460948:role/role-aws-eks-secret-csi-demo
+kubectl annotate serviceaccount my-sa eks.amazonaws.com/role-arn=<role arn>
 ```
